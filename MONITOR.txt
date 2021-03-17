@@ -1,0 +1,26 @@
+if (worldInfo->items[squaresign].foreground == 1240)
+				{
+					auto currentworld = worldInfo->name + "/X" + std::to_string(squaresign);
+					auto isheartm = std::experimental::filesystem::exists("heartmonitor/" + currentworld + ".txt");
+					if (isheartm)
+					{
+						ifstream ifff("heartmonitor/" + currentworld + ".txt");
+						string growid = "";
+						ifff >> growid;
+						auto x = squaresign % worldInfo->width;
+						auto y = squaresign / worldInfo->width;
+						bool found = false;
+						ENetPeer* currentPeer;
+						for (currentPeer = server->peers; currentPeer < &server->peers[server->peerCount]; ++currentPeer)
+						{
+							if (currentPeer->state != ENET_PEER_STATE_CONNECTED) continue;
+							if (static_cast<PlayerInfo*>(currentPeer->data)->rawName == growid)
+							{
+								found = true;
+								sendHMonitor(peer, x, y, growid, true);
+								break;
+							}
+						}
+						if (!found) sendHMonitor(peer, x, y, growid, false);
+					}
+				}
